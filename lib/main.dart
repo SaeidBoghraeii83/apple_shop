@@ -1,3 +1,4 @@
+import 'package:apple_shop/screens/bestseller_screen.dart';
 import 'package:apple_shop/screens/category_screen.dart';
 import 'package:apple_shop/screens/home_screen.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class Application extends StatelessWidget {
       splitScreenMode: true,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: CategoryScreen(),
+        home: BestsellerScreen(),
       ),
     );
   }
