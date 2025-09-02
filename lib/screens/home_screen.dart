@@ -24,7 +24,7 @@ class HomeScreen extends StatelessWidget {
             SliverPadding(
               padding: EdgeInsetsGeometry.symmetric(
                 horizontal: 25.w,
-                vertical: 15.h,
+                vertical: 7.h,
               ),
               sliver: SliverToBoxAdapter(
                 child: Align(
@@ -47,9 +47,20 @@ class HomeScreen extends StatelessWidget {
             SliverPadding(
               padding: EdgeInsetsGeometry.symmetric(
                 horizontal: 17.w,
-                vertical: 15.h,
+                vertical: 8.h,
               ),
               sliver: SliverToBoxAdapter(child: _getBestSellerItem()),
+            ),
+            SliverPadding(
+              padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
+              sliver: SliverToBoxAdapter(child: _getProductHomeItem()),
+            ),
+            SliverPadding(
+              padding: EdgeInsetsGeometry.symmetric(
+                horizontal: 17.w,
+                vertical: 15.h,
+              ),
+              sliver: SliverToBoxAdapter(child: _getMostVisited()),
             ),
             SliverPadding(
               padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
@@ -159,7 +170,7 @@ Widget _getCategoryItem() {
   return Column(
     children: [
       SizedBox(
-        height: 145,
+        height: 110,
         child: ListView.builder(
           scrollDirection: Axis.horizontal,
           itemCount: 10,
@@ -382,3 +393,35 @@ Widget _getProductHomeItem() {
 }
 
 // ======================================================
+
+Widget _getMostVisited() {
+  return Row(
+    children: [
+      Row(
+        children: [
+          Image.asset('images/icon_left_categroy.png'),
+          SizedBox(width: 10),
+          Text(
+            'پر بازدید ترین',
+            style: TextStyle(
+              color: Colors.indigo,
+              fontFamily: 'SM',
+              fontWeight: FontWeight.bold,
+              fontSize: 12.sp,
+            ),
+          ),
+        ],
+      ),
+      Spacer(),
+      Text(
+        'پر فروش ترین ها',
+        style: TextStyle(
+          color: Colors.black,
+          fontFamily: 'SM',
+          fontSize: 12.sp,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ],
+  );
+}
