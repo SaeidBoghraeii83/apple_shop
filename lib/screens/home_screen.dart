@@ -50,7 +50,7 @@ class HomeScreen extends StatelessWidget {
                 horizontal: 17.w,
                 vertical: 8.h,
               ),
-              sliver: SliverToBoxAdapter(child: _getBestSellerItem()),
+              sliver: SliverToBoxAdapter(child: _getBestSellerItem(context)),
             ),
             SliverPadding(
               padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
@@ -203,7 +203,7 @@ Widget _getCategoryItem() {
 }
 
 //==============================
-Widget _getBestSellerItem() {
+Widget _getBestSellerItem(BuildContext context) {
   // گرفتن پر فروش ترین ها
   return Row(
     children: [
@@ -212,7 +212,9 @@ Widget _getBestSellerItem() {
           Image.asset('images/icon_left_categroy.png'),
           SizedBox(width: 10),
           InkWell(
-            onTap: () => BestsellerScreen(),
+            onTap: () => Navigator.of(
+              context,
+            ).push(MaterialPageRoute(builder: (context) => BestsellerScreen())),
             child: Text(
               'مشاهده همه',
               style: TextStyle(
