@@ -1,3 +1,4 @@
+import 'package:apple_shop/screens/bestseller_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -143,19 +144,15 @@ Widget _getBannerSlider(PageController bannerController) {
         bottom: 17,
         child: SmoothPageIndicator(
           controller: bannerController,
-          count: count,
+          count: 6,
           axisDirection: Axis.horizontal,
-          effect: ScrollingDotsEffect(
-            spacing: 8.0,
-            radius: 4,
-            dotWidth: 20,
-            activeDotScale: 1,
-            activeStrokeWidth: 4,
-            dotHeight: 4,
-            paintStyle: PaintingStyle.fill,
-            strokeWidth: 1,
+          effect: ExpandingDotsEffect(
             dotColor: Colors.white,
-            activeDotColor: Colors.indigo,
+            activeDotColor: Colors.indigoAccent,
+
+            expansionFactor: 6,
+            dotHeight: 6,
+            dotWidth: 6,
           ),
         ),
       ),
@@ -214,13 +211,16 @@ Widget _getBestSellerItem() {
         children: [
           Image.asset('images/icon_left_categroy.png'),
           SizedBox(width: 10),
-          Text(
-            'مشاهده همه',
-            style: TextStyle(
-              color: Colors.indigo,
-              fontFamily: 'SM',
-              fontWeight: FontWeight.bold,
-              fontSize: 12.sp,
+          InkWell(
+            onTap: () => BestsellerScreen(),
+            child: Text(
+              'مشاهده همه',
+              style: TextStyle(
+                color: Colors.indigo,
+                fontFamily: 'SM',
+                fontWeight: FontWeight.bold,
+                fontSize: 12.sp,
+              ),
             ),
           ),
         ],
