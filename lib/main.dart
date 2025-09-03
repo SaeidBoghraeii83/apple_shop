@@ -2,6 +2,7 @@ import 'package:apple_shop/screens/bestseller_screen.dart';
 import 'package:apple_shop/screens/category_screen.dart';
 import 'package:apple_shop/screens/home_screen.dart';
 import 'package:apple_shop/screens/product_detail_screen.dart';
+import 'package:apple_shop/screens/profilescreen.dart';
 import 'package:apple_shop/screens/shoppingbasket_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -21,7 +22,7 @@ class Application extends StatelessWidget {
       splitScreenMode: true,
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
-        home: Product_Detail_Screen(),
+        home: Profile_Screen(),
       ),
     );
   }
