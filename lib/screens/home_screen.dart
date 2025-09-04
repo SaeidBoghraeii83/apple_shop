@@ -2,6 +2,7 @@ import 'package:apple_shop/bloc/home/home_bloc.dart';
 import 'package:apple_shop/bloc/home/home_event.dart';
 import 'package:apple_shop/bloc/home/home_state.dart';
 import 'package:apple_shop/model/bannerModel.dart';
+import 'package:apple_shop/model/categoryModel.dart';
 import 'package:apple_shop/screens/bestseller_screen.dart';
 import 'package:apple_shop/widget/cashed_Image.dart';
 import 'package:flutter/material.dart';
@@ -50,9 +51,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ],
-
                 _getTextCategory(),
-                _getCategory(),
+                if (state is HomeRequestSuccessState) ...[
+                  state.categoryList.fold(
+                    (errorMessage) {
+                      return SliverToBoxAdapter(child: Text(errorMessage));
+                    },
+                    (categoryList) {
+                      return SliverToBoxAdapter(
+                        child: CategoryProduct(categoryList: categoryList),
+                      );
+                    },
+                  ),
+                ],
                 _getBestSeller(),
                 _getProductHome(),
                 __getMostVisited(),
@@ -100,18 +111,6 @@ class _getBestSeller extends StatelessWidget {
     return SliverPadding(
       padding: EdgeInsetsGeometry.symmetric(horizontal: 17.w, vertical: 8.h),
       sliver: SliverToBoxAdapter(child: _getBestSellerItem(context)),
-    );
-  }
-}
-
-class _getCategory extends StatelessWidget {
-  const _getCategory({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
-      sliver: SliverToBoxAdapter(child: _getCategoryItem()),
     );
   }
 }
@@ -190,7 +189,7 @@ Widget _getAppBar() {
 }
 
 //======================================
-
+// قسمت گرفتن بنر از سرور
 class BannerSlider extends StatelessWidget {
   final List<BannerModel>? list;
   var bannerController = PageController(viewportFraction: 0.9);
@@ -243,44 +242,74 @@ class BannerSlider extends StatelessWidget {
 
 //===============================
 
-Widget _getCategoryItem() {
-  // گرفتن ایتم های دسته بندی
-  return Column(
-    children: [
-      SizedBox(
-        height: 110,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: 10,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Column(
-                children: [
-                  Container(
-                    width: 50.w,
-                    height: 45.h,
-                    decoration: BoxDecoration(
-                      color: Colors.teal,
-                      borderRadius: BorderRadius.circular(17),
+// گرفتن ایتم های دسته بندی
+class CategoryProduct extends StatelessWidget {
+  final List<CategoryModel> categoryList;
+
+  const CategoryProduct({super.key, required this.categoryList});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 100.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: categoryList.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(15.r),
+                      child: Container(
+                        width: 52.w,
+                        height: 45.h,
+                        decoration: BoxDecoration(
+                          color: _hexToColor(categoryList[index].color),
+                        ),
+                        child: Center(
+                          child: SizedBox(
+                            width: 25.w,
+                            height: 20.h,
+                            child: CashedImage(
+                              imageUrl: categoryList[index].icon ?? 'error',
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
-                  SizedBox(height: 5.h),
-                  Text(
-                    'همه',
-                    style: TextStyle(
-                      fontFamily: 'SM',
-                      fontWeight: FontWeight.w700,
+                    SizedBox(height: 15.h),
+                    Text(
+                      categoryList[index].title ?? '',
+                      style: const TextStyle(
+                        fontFamily: 'SM',
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                ],
-              ),
-            );
-          },
+                  ],
+                ),
+              );
+            },
+          ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
+
+  /// تبدیل استرینگ رنگ به Color
+  Color _hexToColor(String? hex) {
+    try {
+      hex = hex?.replaceAll('#', '');
+      if (hex == null || hex.isEmpty) return Colors.grey;
+
+      return Color(int.parse('FF$hex', radix: 16)); // شفافیت + رنگ
+    } catch (_) {
+      return Colors.grey; // رنگ پیش‌فرض
+    }
+  }
 }
 
 //==============================

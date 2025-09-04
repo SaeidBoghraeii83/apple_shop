@@ -1,4 +1,5 @@
 import 'package:apple_shop/model/bannerModel.dart';
+import 'package:apple_shop/model/categoryModel.dart';
 import 'package:dartz/dartz.dart';
 
 abstract class HomeState {}
@@ -10,5 +11,6 @@ class HomeLoadingState extends HomeState {} // وضعیت لودینگ قبل ا
 class HomeRequestSuccessState extends HomeState {
   // هر فرآیند درخواست زدن در این قسمته
   Either<String, List<BannerModel>> bannerList;
-  HomeRequestSuccessState(this.bannerList);
+  Either<String, List<CategoryModel>> categoryList;
+  HomeRequestSuccessState(this.bannerList, this.categoryList);
 }
