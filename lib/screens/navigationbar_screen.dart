@@ -16,7 +16,7 @@ class Main_Screen extends StatefulWidget {
 }
 
 class _Main_ScreenState extends State<Main_Screen> {
-  int _selectedBottomNavigationItem = 0;
+  int _selectedBottomNavigationItem = 3;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
