@@ -272,7 +272,8 @@ class CategoryProduct extends StatelessWidget {
                         ),
                         child: Center(
                           child: SizedBox(
-                            height: 25.h,
+                            width: 25.w,
+                            height: 20.h,
                             child: CashedImage(
                               imageUrl: categoryList[index].icon ?? 'error',
                             ),
