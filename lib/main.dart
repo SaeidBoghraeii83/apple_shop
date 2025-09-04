@@ -1,3 +1,4 @@
+import 'package:apple_shop/di/di.dart';
 import 'package:apple_shop/screens/bestseller_screen.dart';
 import 'package:apple_shop/screens/category_screen.dart';
 import 'package:apple_shop/screens/home_screen.dart';
@@ -8,7 +9,8 @@ import 'package:apple_shop/screens/shoppingbasket_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-void main() {
+void main() async {
+  await getItInit();
   runApp(Application());
 }
 

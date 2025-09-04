@@ -1,3 +1,4 @@
+import 'package:apple_shop/bloc/category_bloc.dart';
 import 'package:apple_shop/screens/category_screen.dart';
 import 'package:apple_shop/screens/home_screen.dart';
 import 'package:apple_shop/screens/profilescreen.dart';
@@ -82,7 +83,10 @@ class _Main_ScreenState extends State<Main_Screen> {
     return <Widget>[
       Profile_Screen(),
       Shopping_Basket(),
-      CategoryScreen(),
+      BlocProvider(
+        create: (context) => CategoryBloc(),
+        child: CategoryScreen(),
+      ),
       HomeScreen(),
     ];
   }
