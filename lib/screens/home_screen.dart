@@ -1,79 +1,158 @@
+import 'package:apple_shop/bloc/home/home_bloc.dart';
+import 'package:apple_shop/bloc/home/home_event.dart';
+import 'package:apple_shop/bloc/home/home_state.dart';
+import 'package:apple_shop/model/bannerModel.dart';
 import 'package:apple_shop/screens/bestseller_screen.dart';
+import 'package:apple_shop/widget/cashed_Image.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<HomeBloc>(context).add(HomeGetInitilzeData());
+  }
+
+  @override
   Widget build(BuildContext context) {
-    var bannerController = PageController(viewportFraction: 0.9);
     return Scaffold(
       backgroundColor: Color(0xffEEEEEE),
       body: SafeArea(
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: EdgeInsetsGeometry.symmetric(
-                horizontal: 20.w,
-                vertical: 15.h,
-              ),
-              sliver: SliverToBoxAdapter(child: _getAppBar()),
-            ),
-            SliverToBoxAdapter(child: _getBannerSlider(bannerController)),
-            SliverPadding(
-              padding: EdgeInsetsGeometry.symmetric(
-                horizontal: 25.w,
-                vertical: 7.h,
-              ),
-              sliver: SliverToBoxAdapter(
-                child: Align(
-                  alignment: AlignmentGeometry.bottomRight,
-                  child: Text(
-                    'دسته بندی',
-                    style: TextStyle(
-                      fontFamily: 'SM',
-                      fontSize: 12.sp,
-                      fontWeight: FontWeight.bold,
-                    ),
+        child: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            return CustomScrollView(
+              slivers: [
+                if (state is HomeLoadingState) ...[
+                  SliverToBoxAdapter(
+                    child: Center(child: CircularProgressIndicator()),
                   ),
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
-              sliver: SliverToBoxAdapter(child: _getCategoryItem()),
-            ),
-            SliverPadding(
-              padding: EdgeInsetsGeometry.symmetric(
-                horizontal: 17.w,
-                vertical: 8.h,
-              ),
-              sliver: SliverToBoxAdapter(child: _getBestSellerItem(context)),
-            ),
-            SliverPadding(
-              padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
-              sliver: SliverToBoxAdapter(child: _getProductHomeItem()),
-            ),
-            SliverPadding(
-              padding: EdgeInsetsGeometry.symmetric(
-                horizontal: 17.w,
-                vertical: 15.h,
-              ),
-              sliver: SliverToBoxAdapter(child: _getMostVisited()),
-            ),
-            SliverPadding(
-              padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
-              sliver: SliverToBoxAdapter(child: _getProductHomeItem()),
-            ),
-          ],
+                ],
+                _getSearchBox(),
+                if (state is HomeRequestSuccessState) ...[
+                  state.bannerList.fold(
+                    (errorMessage) {
+                      return SliverToBoxAdapter(child: Text(errorMessage));
+                    },
+                    (BannerData) {
+                      return SliverToBoxAdapter(
+                        child: BannerSlider(list: BannerData),
+                      );
+                    },
+                  ),
+                ],
+
+                _getTextCategory(),
+                _getCategory(),
+                _getBestSeller(),
+                _getProductHome(),
+                __getMostVisited(),
+                _getProductHome(),
+              ],
+            );
+          },
         ),
       ),
     );
   }
 }
-//============================================
+
+//========================================= ویجت ها
+
+class __getMostVisited extends StatelessWidget {
+  const __getMostVisited({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 17.w, vertical: 15.h),
+      sliver: SliverToBoxAdapter(child: _getMostVisited()),
+    );
+  }
+}
+
+class _getProductHome extends StatelessWidget {
+  const _getProductHome({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
+      sliver: SliverToBoxAdapter(child: _getProductHomeItem()),
+    );
+  }
+}
+
+class _getBestSeller extends StatelessWidget {
+  const _getBestSeller({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 17.w, vertical: 8.h),
+      sliver: SliverToBoxAdapter(child: _getBestSellerItem(context)),
+    );
+  }
+}
+
+class _getCategory extends StatelessWidget {
+  const _getCategory({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
+      sliver: SliverToBoxAdapter(child: _getCategoryItem()),
+    );
+  }
+}
+
+class _getTextCategory extends StatelessWidget {
+  const _getTextCategory({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 25.w, vertical: 7.h),
+      sliver: SliverToBoxAdapter(
+        child: Align(
+          alignment: AlignmentGeometry.bottomRight,
+          child: Text(
+            'دسته بندی',
+            style: TextStyle(
+              fontFamily: 'SM',
+              fontSize: 12.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _getSearchBox extends StatelessWidget {
+  const _getSearchBox({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SliverPadding(
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 20.w, vertical: 15.h),
+      sliver: SliverToBoxAdapter(child: _getAppBar()),
+    );
+  }
+}
+
+//========================================= ویجت ها
 
 Widget _getAppBar() {
   // اپ بار صفحه اصلی
@@ -112,52 +191,54 @@ Widget _getAppBar() {
 
 //======================================
 
-Widget _getBannerSlider(PageController bannerController) {
-  // گرفتن بنر اسلایدر
-  var count = 5;
+class BannerSlider extends StatelessWidget {
+  final List<BannerModel>? list;
+  var bannerController = PageController(viewportFraction: 0.9);
+  BannerSlider({super.key, required this.list});
 
-  return Stack(
-    alignment: AlignmentGeometry.bottomCenter,
-    children: [
-      SizedBox(
-        height: 177,
-        child: PageView.builder(
-          itemCount: count,
-          controller: bannerController,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(9),
-              child: Container(
-                width: 200.w,
-                height: 200.h,
-                decoration: BoxDecoration(
-                  color: Colors.teal,
-                  borderRadius: BorderRadius.circular(10),
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      alignment: AlignmentGeometry.bottomCenter,
+      children: [
+        SizedBox(
+          height: 177,
+          child: PageView.builder(
+            itemCount: list?.length,
+            controller: bannerController,
+            scrollDirection: Axis.horizontal,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(9),
+                child: ClipRRect(
+                  borderRadius: BorderRadiusGeometry.all(Radius.circular(15.r)),
+                  child: CashedImage(
+                    imageUrl: list?[index].thumbnail ?? 'error data thumbnail',
+                  ),
                 ),
-              ),
-            );
-          },
-        ),
-      ),
-      Positioned(
-        bottom: 17,
-        child: SmoothPageIndicator(
-          controller: bannerController,
-          count: 6,
-          axisDirection: Axis.horizontal,
-          effect: ExpandingDotsEffect(
-            dotColor: Colors.white,
-            activeDotColor: Colors.indigoAccent,
-
-            expansionFactor: 6,
-            dotHeight: 6,
-            dotWidth: 6,
+              );
+            },
           ),
         ),
-      ),
-    ],
-  );
+        Positioned(
+          bottom: 17,
+          child: SmoothPageIndicator(
+            controller: bannerController,
+            count: list?.length ?? 0,
+            axisDirection: Axis.horizontal,
+            effect: ExpandingDotsEffect(
+              dotColor: Colors.white,
+              activeDotColor: Colors.lightBlue,
+
+              expansionFactor: 6,
+              dotHeight: 6,
+              dotWidth: 6,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 //===============================

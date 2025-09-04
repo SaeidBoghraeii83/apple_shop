@@ -1,8 +1,8 @@
 import 'dart:math';
 
-import 'package:apple_shop/bloc/category_bloc.dart';
-import 'package:apple_shop/bloc/category_event.dart';
-import 'package:apple_shop/bloc/category_state.dart';
+import 'package:apple_shop/bloc/category_Bloc/category_bloc.dart';
+import 'package:apple_shop/bloc/category_Bloc/category_event.dart';
+import 'package:apple_shop/bloc/category_Bloc/category_state.dart';
 import 'package:apple_shop/model/categoryModel.dart';
 import 'package:apple_shop/widget/cashed_Image.dart';
 import 'package:flutter/cupertino.dart';
