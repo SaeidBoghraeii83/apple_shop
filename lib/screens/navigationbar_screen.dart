@@ -1,4 +1,5 @@
-import 'package:apple_shop/bloc/category_bloc.dart';
+import 'package:apple_shop/bloc/category_Bloc/category_bloc.dart';
+import 'package:apple_shop/bloc/home/home_bloc.dart';
 import 'package:apple_shop/screens/category_screen.dart';
 import 'package:apple_shop/screens/home_screen.dart';
 import 'package:apple_shop/screens/profilescreen.dart';
@@ -87,7 +88,7 @@ class _Main_ScreenState extends State<Main_Screen> {
         create: (context) => CategoryBloc(),
         child: CategoryScreen(),
       ),
-      HomeScreen(),
+      BlocProvider(create: (context) => HomeBloc(), child: HomeScreen()),
     ];
   }
 }
