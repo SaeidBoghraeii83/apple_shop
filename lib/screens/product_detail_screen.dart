@@ -18,7 +18,7 @@ class Product_Detail_Screen extends StatelessWidget {
                 vertical: 4.h,
                 horizontal: 20.w,
               ),
-              sliver: SliverToBoxAdapter(child: _getAppbarDetail()),
+              sliver: SliverToBoxAdapter(child: _getAppbarDetail(context)),
             ),
 
             SliverPadding(
@@ -406,7 +406,7 @@ class Product_Detail_Screen extends StatelessWidget {
   }
 }
 
-Widget _getAppbarDetail() {
+Widget _getAppbarDetail(BuildContext context) {
   // گرفتن اپ بار
   return Container(
     height: 40.h,
@@ -429,7 +429,10 @@ Widget _getAppbarDetail() {
               fontWeight: FontWeight.w700,
             ),
           ),
-          Image.asset('images/back.png'),
+          GestureDetector(
+            child: Image.asset('images/back.png'),
+            onTap: () => Navigator.pop(context),
+          ),
         ],
       ),
     ),

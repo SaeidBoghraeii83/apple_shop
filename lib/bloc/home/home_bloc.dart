@@ -3,18 +3,32 @@ import 'package:apple_shop/bloc/home/home_state.dart';
 import 'package:apple_shop/di/di.dart';
 import 'package:apple_shop/repository/banner_repository.dart';
 import 'package:apple_shop/repository/category_repository.dart';
+import 'package:apple_shop/repository/product_repository.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
   final IBannerRepository _repository = locator.get();
   final ICategoryRepository _categoryRepository = locator.get();
+  final IProductRepository _productRepository = locator.get();
 
   HomeBloc() : super(HomeInitState()) {
     on<HomeGetInitilzeData>((event, emit) async {
-      emit(HomeInitState());
+      emit(HomeLoadingState());
       var bannerList = await _repository.getBannerData();
       var categoryList = await _categoryRepository.getCategoryData();
-      emit(HomeRequestSuccessState(bannerList, categoryList));
+      var productList = await _productRepository.getProduct();
+      var bestsellerProductList = await _productRepository.getBestSeller();
+      var hotestProductList = await _productRepository.getHotest();
+
+      emit(
+        HomeRequestSuccessState(
+          bannerList,
+          categoryList,
+          productList,
+          bestsellerProductList,
+          hotestProductList,
+        ),
+      ); // یک ریکوستی که چندین مقدار داره
     });
   }
 }
