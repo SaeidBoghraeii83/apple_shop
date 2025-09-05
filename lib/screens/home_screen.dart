@@ -3,7 +3,9 @@ import 'package:apple_shop/bloc/home/home_event.dart';
 import 'package:apple_shop/bloc/home/home_state.dart';
 import 'package:apple_shop/model/bannerModel.dart';
 import 'package:apple_shop/model/categoryModel.dart';
+import 'package:apple_shop/model/productModel.dart';
 import 'package:apple_shop/screens/bestseller_screen.dart';
+import 'package:apple_shop/screens/product_detail_screen.dart';
 import 'package:apple_shop/widget/cashed_Image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -31,45 +33,60 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         child: BlocBuilder<HomeBloc, HomeState>(
           builder: (context, state) {
-            return CustomScrollView(
-              slivers: [
-                if (state is HomeLoadingState) ...[
+            if (state is HomeLoadingState) {
+              return CustomScrollView(
+                slivers: [
+                  SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(
+                      child: CircularProgressIndicator(color: Colors.black),
+                    ),
+                  ),
+                ],
+              );
+            }
+
+            if (state is HomeRequestSuccessState) {
+              return CustomScrollView(
+                slivers: [
+                  _getSearchBox(),
                   SliverToBoxAdapter(
-                    child: Center(child: CircularProgressIndicator()),
+                    child: state.bannerList.fold(
+                      (errorMessage) => Text(errorMessage),
+                      (bannerData) => BannerSlider(list: bannerData),
+                    ),
+                  ),
+                  _getTextCategory(),
+                  SliverToBoxAdapter(
+                    child: state.categoryList.fold(
+                      (errorMessage) => Text(errorMessage),
+                      (categoryList) =>
+                          CategoryProduct(categoryList: categoryList),
+                    ),
+                  ),
+                  _getBestSellerItem(context),
+                  SliverToBoxAdapter(
+                    child: state.bestsellerProductList.fold(
+                      (errorMessage) => Text(errorMessage),
+                      (productBestSellerList) => Product_BestSeller(
+                        productBestseller: productBestSellerList,
+                      ),
+                    ),
+                  ),
+                  _getTextMostVisited(),
+                  SliverToBoxAdapter(
+                    child: state.hotestProductList.fold(
+                      (errorMessage) => Text(errorMessage),
+                      (productHotestList) =>
+                          Product_Hotest(productHotest: productHotestList),
+                    ),
                   ),
                 ],
-                _getSearchBox(),
-                if (state is HomeRequestSuccessState) ...[
-                  state.bannerList.fold(
-                    (errorMessage) {
-                      return SliverToBoxAdapter(child: Text(errorMessage));
-                    },
-                    (BannerData) {
-                      return SliverToBoxAdapter(
-                        child: BannerSlider(list: BannerData),
-                      );
-                    },
-                  ),
-                ],
-                _getTextCategory(),
-                if (state is HomeRequestSuccessState) ...[
-                  state.categoryList.fold(
-                    (errorMessage) {
-                      return SliverToBoxAdapter(child: Text(errorMessage));
-                    },
-                    (categoryList) {
-                      return SliverToBoxAdapter(
-                        child: CategoryProduct(categoryList: categoryList),
-                      );
-                    },
-                  ),
-                ],
-                _getBestSeller(),
-                _getProductHome(),
-                __getMostVisited(),
-                _getProductHome(),
-              ],
-            );
+              );
+            }
+
+            // حالت اولیه یا fallback
+            return const SizedBox.shrink();
           },
         ),
       ),
@@ -78,42 +95,6 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 //========================================= ویجت ها
-
-class __getMostVisited extends StatelessWidget {
-  const __getMostVisited({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 17.w, vertical: 15.h),
-      sliver: SliverToBoxAdapter(child: _getMostVisited()),
-    );
-  }
-}
-
-class _getProductHome extends StatelessWidget {
-  const _getProductHome({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 10.w),
-      sliver: SliverToBoxAdapter(child: _getProductHomeItem()),
-    );
-  }
-}
-
-class _getBestSeller extends StatelessWidget {
-  const _getBestSeller({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SliverPadding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 17.w, vertical: 8.h),
-      sliver: SliverToBoxAdapter(child: _getBestSellerItem(context)),
-    );
-  }
-}
 
 class _getTextCategory extends StatelessWidget {
   const _getTextCategory({super.key});
@@ -129,6 +110,7 @@ class _getTextCategory extends StatelessWidget {
             'دسته بندی',
             style: TextStyle(
               fontFamily: 'SM',
+              color: Color(0xff858585),
               fontSize: 12.sp,
               fontWeight: FontWeight.bold,
             ),
@@ -145,47 +127,42 @@ class _getSearchBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SliverPadding(
-      padding: EdgeInsetsGeometry.symmetric(horizontal: 20.w, vertical: 15.h),
-      sliver: SliverToBoxAdapter(child: _getAppBar()),
+      padding: EdgeInsetsGeometry.symmetric(horizontal: 20.w, vertical: 8.h),
+      sliver: SliverToBoxAdapter(
+        child: Container(
+          height: 45.h,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.r),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(11),
+            child: Row(
+              children: [
+                Image.asset('images/icon_apple_blue.png'),
+                Spacer(),
+                Row(
+                  children: [
+                    Text(
+                      'جستجوی محصولات',
+                      style: TextStyle(
+                        fontSize: 16.sp,
+                        fontFamily: 'SM',
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xff858585),
+                      ),
+                    ),
+                    SizedBox(width: 7.w),
+                    Image.asset('images/icon_search.png'),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
-}
-
-//========================================= ویجت ها
-
-Widget _getAppBar() {
-  // اپ بار صفحه اصلی
-  return Container(
-    height: 45.h,
-    decoration: BoxDecoration(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(15.r),
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(11),
-      child: Row(
-        children: [
-          Image.asset('images/icon_apple_blue.png'),
-          Spacer(),
-          Row(
-            children: [
-              Text(
-                'جستجوی محصولات',
-                style: TextStyle(
-                  fontSize: 16.sp,
-                  fontFamily: 'SM',
-                  fontWeight: FontWeight.w700,
-                  color: Color(0xff858585),
-                ),
-              ),
-              SizedBox(width: 7.w),
-              Image.asset('images/icon_search.png'),
-            ],
-          ),
-        ],
-      ),
-    ),
-  );
 }
 
 //======================================
@@ -201,7 +178,7 @@ class BannerSlider extends StatelessWidget {
       alignment: AlignmentGeometry.bottomCenter,
       children: [
         SizedBox(
-          height: 177,
+          height: 150.h,
           child: PageView.builder(
             itemCount: list?.length,
             controller: bannerController,
@@ -212,6 +189,7 @@ class BannerSlider extends StatelessWidget {
                 child: ClipRRect(
                   borderRadius: BorderRadiusGeometry.all(Radius.circular(15.r)),
                   child: CashedImage(
+                    fit: BoxFit.cover,
                     imageUrl: list?[index].thumbnail ?? 'error data thumbnail',
                   ),
                 ),
@@ -272,9 +250,10 @@ class CategoryProduct extends StatelessWidget {
                         ),
                         child: Center(
                           child: SizedBox(
-                            width: 25.w,
+                            width: 30.w,
                             height: 20.h,
                             child: CashedImage(
+                              fit: BoxFit.contain,
                               imageUrl: categoryList[index].icon ?? 'error',
                             ),
                           ),
@@ -284,8 +263,9 @@ class CategoryProduct extends StatelessWidget {
                     SizedBox(height: 15.h),
                     Text(
                       categoryList[index].title ?? '',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontFamily: 'SM',
+                        fontSize: 11.sp,
                         fontWeight: FontWeight.w700,
                       ),
                     ),
@@ -315,225 +295,602 @@ class CategoryProduct extends StatelessWidget {
 //==============================
 Widget _getBestSellerItem(BuildContext context) {
   // گرفتن پر فروش ترین ها
-  return Row(
-    children: [
-      Row(
+  return SliverPadding(
+    padding: EdgeInsetsGeometry.symmetric(horizontal: 17.w, vertical: 8.h),
+    sliver: SliverToBoxAdapter(
+      child: Row(
         children: [
-          Image.asset('images/icon_left_categroy.png'),
-          SizedBox(width: 10),
-          InkWell(
-            onTap: () => Navigator.of(
-              context,
-            ).push(MaterialPageRoute(builder: (context) => BestsellerScreen())),
-            child: Text(
-              'مشاهده همه',
-              style: TextStyle(
-                color: Colors.indigo,
-                fontFamily: 'SM',
-                fontWeight: FontWeight.bold,
-                fontSize: 12.sp,
+          Row(
+            children: [
+              Image.asset('images/icon_left_categroy.png'),
+              SizedBox(width: 10),
+              InkWell(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => BestsellerScreen()),
+                ),
+                child: Text(
+                  'مشاهده همه',
+                  style: TextStyle(
+                    color: Colors.indigo,
+                    fontFamily: 'SM',
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.sp,
+                  ),
+                ),
               ),
+            ],
+          ),
+          Spacer(),
+          Text(
+            'پر فروش ترین ها',
+            style: TextStyle(
+              color: Color(0xff858585),
+              fontFamily: 'SM',
+              fontSize: 12.sp,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
       ),
-      Spacer(),
-      Text(
-        'پر فروش ترین ها',
-        style: TextStyle(
-          color: Colors.black,
-          fontFamily: 'SM',
-          fontSize: 12.sp,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ],
+    ),
   );
 }
 
 //===================================
+// محصولات اصلی
+class Product_Item extends StatelessWidget {
+  List<ProductModel> product;
+  Product_Item({super.key, required this.product});
 
-Widget _getProductHomeItem() {
-  //گرفتن محصولات  صفحه اصلی
-  return Column(
-    children: [
-      SizedBox(
-        height: 255,
-        child: ListView.builder(
-          scrollDirection: Axis.horizontal,
-          itemCount: 10,
-          itemBuilder: (context, index) {
-            return Padding(
-              padding: const EdgeInsets.all(10),
-              child: Container(
-                width: 150.w,
-                height: 160.h,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  children: [
-                    Expanded(
-                      flex: 3,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15),
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 200.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: product.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(10),
+                child: Container(
+                  width: 150.w,
+                  height: 160.h,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              topRight: Radius.circular(15),
+                            ),
                           ),
-                        ),
 
-                        height: 170,
-                        width: double.infinity,
+                          height: 170,
+                          width: double.infinity,
 
-                        child: Stack(
-                          children: [
-                            Positioned(
-                              top: 20,
-                              left: 52,
-                              child: Image.asset('images/iphone.png'),
-                            ),
-                            Positioned(
-                              top: 6,
-                              right: 8,
-                              child: Image.asset(
-                                'images/active_fav_product.png',
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 35,
-                              left: 13,
-                              child: Container(
-                                width: 30,
-                                height: 15,
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Text(
-                                  textAlign: TextAlign.center,
-                                  '%3',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'SM',
-                                    fontSize: 10.sp,
-                                    fontWeight: FontWeight.bold,
+                          child: Stack(
+                            children: [
+                              Positioned(
+                                top: 27,
+                                left: 40,
+                                child: SizedBox(
+                                  height: 78.h,
+                                  width: 80.w,
+                                  child: CashedImage(
+                                    fit: BoxFit.contain,
+                                    imageUrl: product[index].thumbnail,
                                   ),
                                 ),
                               ),
+                              Positioned(
+                                top: 10,
+                                right: 12,
+                                child: Image.asset(
+                                  'images/active_fav_product.png',
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 35,
+                                left: 10,
+                                child: Container(
+                                  width: 25,
+                                  height: 15,
+                                  decoration: BoxDecoration(
+                                    color: Colors.red,
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Text(
+                                    textAlign: TextAlign.center,
+                                    '${product[index].persent!.round().toString()} ٪',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontFamily: 'SM',
+                                      fontSize: 10.sp,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                bottom: 10,
+                                right: 13.r,
+                                child: Text(
+                                  product[index].name,
+                                  maxLines: 1,
+                                  style: TextStyle(
+                                    fontFamily: 'SM',
+                                    fontWeight: FontWeight.w700,
+                                    fontSize: 12.sp,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 65, 94, 255),
+                            borderRadius: BorderRadius.only(
+                              bottomLeft: Radius.circular(15),
+                              bottomRight: Radius.circular(15),
                             ),
-                            Positioned(
-                              bottom: 4,
-                              right: 10.r,
-                              child: Text(
-                                'آیفون 13 پرو مکس',
+                          ),
+
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Text(
+                                'تومان',
                                 style: TextStyle(
+                                  color: Colors.white,
                                   fontFamily: 'SM',
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 12.sp,
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.teal,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(15),
-                            bottomRight: Radius.circular(15),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                    product[index].price.toString(),
+                                    style: const TextStyle(
+                                      fontFamily: 'sm',
+                                      fontSize: 12,
+                                      color: Colors.white,
+                                      decoration: TextDecoration.lineThrough,
+                                    ),
+                                  ),
+                                  Text(
+                                    product[index].realPrice.toString(),
+                                    style: const TextStyle(
+                                      fontFamily: 'sm',
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              SizedBox(
+                                height: 25.h,
+                                width: 25.w,
+                                child: Image.asset(
+                                  'images/icon_right_arrow_cricle.png',
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Text(
-                              'تومان',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: 'SM',
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  '5,350,000',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'SM',
-                                  ),
-                                ),
-                                Text(
-                                  '16,340,000',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontFamily: 'SM',
-                                  ),
-                                ),
-                              ],
-                            ),
-                            SizedBox(
-                              height: 25.h,
-                              width: 25.w,
-                              child: Image.asset(
-                                'images/icon_right_arrow_cricle.png',
-                              ),
-                            ),
-                          ],
-                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
-      ),
-    ],
-  );
+      ],
+    );
+  }
 }
 
 // ======================================================
-
-Widget _getMostVisited() {
-  return Row(
-    children: [
-      Row(
+// پر بازدید ترین ها
+Widget _getTextMostVisited() {
+  return SliverPadding(
+    padding: EdgeInsetsGeometry.symmetric(horizontal: 17.w, vertical: 8.h),
+    sliver: SliverToBoxAdapter(
+      child: Row(
         children: [
-          Image.asset('images/icon_left_categroy.png'),
-          SizedBox(width: 10),
+          Row(
+            children: [
+              Image.asset('images/icon_left_categroy.png'),
+              SizedBox(width: 10),
+              Text(
+                'مشاهده همه',
+                style: TextStyle(
+                  color: Colors.indigo,
+                  fontFamily: 'SM',
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12.sp,
+                ),
+              ),
+            ],
+          ),
+          Spacer(),
           Text(
-            'پر بازدید ترین',
+            'پر بازدید ترین ها',
             style: TextStyle(
-              color: Colors.indigo,
+              color: Color(0xff858585),
               fontFamily: 'SM',
-              fontWeight: FontWeight.bold,
               fontSize: 12.sp,
+              fontWeight: FontWeight.bold,
             ),
           ),
         ],
       ),
-      Spacer(),
-      Text(
-        'پر فروش ترین ها',
-        style: TextStyle(
-          color: Colors.black,
-          fontFamily: 'SM',
-          fontSize: 12.sp,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ],
+    ),
   );
+}
+
+//================================
+
+//==================================
+// قسمت پر فروش ترین ها
+
+class Product_BestSeller extends StatelessWidget {
+  List<ProductModel> productBestseller;
+  Product_BestSeller({super.key, required this.productBestseller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 200.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: productBestseller.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(10),
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Product_Detail_Screen(),
+                    ),
+                  ),
+                  child: Container(
+                    width: 150.w,
+                    height: 160.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15),
+                              ),
+                            ),
+
+                            height: 170,
+                            width: double.infinity,
+
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  top: 27,
+                                  left: 40,
+                                  child: SizedBox(
+                                    height: 78.h,
+                                    width: 80.w,
+                                    child: CashedImage(
+                                      fit: BoxFit.contain,
+                                      imageUrl:
+                                          productBestseller[index].thumbnail,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  right: 12,
+                                  child: Image.asset(
+                                    'images/active_fav_product.png',
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 35,
+                                  left: 10,
+                                  child: Container(
+                                    width: 25,
+                                    height: 15,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: Text(
+                                      textAlign: TextAlign.center,
+                                      '${productBestseller[index].persent!.round().toString()} ٪',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'SM',
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 10,
+                                  right: 13.r,
+                                  child: Text(
+                                    productBestseller[index].name,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontFamily: 'SM',
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12.sp,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 65, 94, 255),
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(15),
+                                bottomRight: Radius.circular(15),
+                              ),
+                            ),
+
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                  'تومان',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'SM',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      productBestseller[index].price.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'sm',
+                                        fontSize: 12,
+                                        color: Colors.white,
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
+                                    Text(
+                                      productBestseller[index].realPrice
+                                          .toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'sm',
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 25.h,
+                                  width: 25.w,
+                                  child: Image.asset(
+                                    'images/icon_right_arrow_cricle.png',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+//محصولات پر بازدید ترین
+
+class Product_Hotest extends StatelessWidget {
+  List<ProductModel> productHotest;
+  Product_Hotest({super.key, required this.productHotest});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 200.h,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: productHotest.length,
+            itemBuilder: (context, index) {
+              return Padding(
+                padding: const EdgeInsets.all(10),
+                child: GestureDetector(
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => Product_Detail_Screen(),
+                    ),
+                  ),
+                  child: Container(
+                    width: 150.w,
+                    height: 160.h,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 3,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15),
+                              ),
+                            ),
+
+                            height: 170,
+                            width: double.infinity,
+
+                            child: Stack(
+                              children: [
+                                Positioned(
+                                  top: 27,
+                                  left: 40,
+                                  child: SizedBox(
+                                    height: 78.h,
+                                    width: 80.w,
+                                    child: CashedImage(
+                                      fit: BoxFit.contain,
+                                      imageUrl: productHotest[index].thumbnail,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 10,
+                                  right: 12,
+                                  child: Image.asset(
+                                    'images/active_fav_product.png',
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 35,
+                                  left: 10,
+                                  child: Container(
+                                    width: 25,
+                                    height: 15,
+                                    decoration: BoxDecoration(
+                                      color: Colors.red,
+                                      borderRadius: BorderRadius.circular(15),
+                                    ),
+                                    child: Text(
+                                      textAlign: TextAlign.center,
+                                      '${productHotest[index].persent!.round().toString()} ٪',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontFamily: 'SM',
+                                        fontSize: 10.sp,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  bottom: 10,
+                                  right: 13.r,
+                                  child: Text(
+                                    productHotest[index].name,
+                                    maxLines: 1,
+                                    style: TextStyle(
+                                      fontFamily: 'SM',
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 12.sp,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          flex: 1,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: const Color.fromARGB(255, 65, 94, 255),
+                              borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(15),
+                                bottomRight: Radius.circular(15),
+                              ),
+                            ),
+
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Text(
+                                  'تومان',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'SM',
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      productHotest[index].price.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'sm',
+                                        fontSize: 12,
+                                        color: Colors.white,
+                                        decoration: TextDecoration.lineThrough,
+                                      ),
+                                    ),
+                                    Text(
+                                      productHotest[index].realPrice.toString(),
+                                      style: const TextStyle(
+                                        fontFamily: 'sm',
+                                        fontSize: 16,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(
+                                  height: 25.h,
+                                  width: 25.w,
+                                  child: Image.asset(
+                                    'images/icon_right_arrow_cricle.png',
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ],
+    );
+  }
 }

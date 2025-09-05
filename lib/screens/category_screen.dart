@@ -119,7 +119,10 @@ class ListCategory extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 44),
       sliver: SliverGrid(
         delegate: SliverChildBuilderDelegate(((context, index) {
-          return CashedImage(imageUrl: list?[index].thumbnail ?? 'test');
+          return CashedImage(
+            imageUrl: list?[index].thumbnail ?? 'test',
+            fit: BoxFit.cover,
+          );
         }), childCount: list?.length ?? 0),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,

@@ -1,7 +1,9 @@
 import 'package:apple_shop/data/datasource/bannerDataSource.dart';
 import 'package:apple_shop/data/datasource/categoryDataSource.dart';
+import 'package:apple_shop/data/datasource/productDataSource.dart';
 import 'package:apple_shop/repository/banner_repository.dart';
 import 'package:apple_shop/repository/category_repository.dart';
+import 'package:apple_shop/repository/product_repository.dart';
 import 'package:dio/dio.dart';
 import 'package:get_it/get_it.dart';
 
@@ -19,4 +21,6 @@ Future<void> getItInit() async {
   locator.registerFactory<ICategoryRepository>(() => CategoryRepository());
   locator.registerFactory<IBannerdatasource>(() => BannerRemoteDataSource());
   locator.registerFactory<IBannerRepository>(() => BannerRepository());
+  locator.registerFactory<IProductdatasource>(() => ProductRemotedatasource());
+  locator.registerFactory<IProductRepository>(() => ProductRepository());
 }
